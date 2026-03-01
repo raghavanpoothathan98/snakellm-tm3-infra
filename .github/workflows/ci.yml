@@ -19,6 +19,12 @@ jobs:
       - name: Install make
         run: sudo apt update && sudo apt install make -y
 
+      - name: Ensure pip
+        run: python -m ensurepip --upgrade || true
+        
+      - name: Install python deps
+        run: pip install -r requirements.txt    
+
       - name: Run full infra pipeline
         run: make all
 
