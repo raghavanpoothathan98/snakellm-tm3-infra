@@ -1,0 +1,36 @@
+name: Infra CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate specs
+        run: python scripts/validate_spec.py specs/*.json
+
+      - name: Generate envs
+        run: python scripts/gen_envs.py specs/*.json
+
+      - name: Generate SLURM profile
+        run: python scripts/gen_slurm_profile.py
+
+      - name: Bundle artifacts
+        run: python scripts/bundle.py specs/*.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundled-pipelines
+          path: dist/*.zip
