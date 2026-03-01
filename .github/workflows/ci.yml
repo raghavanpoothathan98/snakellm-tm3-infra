@@ -8,26 +8,19 @@ on:
 jobs:
   validate-and-build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Validate specs
-        run: python scripts/validate_spec.py specs/*.json
+      - name: Install make
+        run: sudo apt update && sudo apt install make -y
 
-      - name: Generate envs
-        run: python scripts/gen_envs.py specs/*.json
-
-      - name: Generate SLURM profile
-        run: python scripts/gen_slurm_profile.py
-
-      - name: Bundle artifacts
-        run: python scripts/bundle.py specs/*.json
+      - name: Run full infra pipeline
+        run: make all
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
